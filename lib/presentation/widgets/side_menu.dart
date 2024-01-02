@@ -1,22 +1,26 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:widgets_app/config/menu/menu_items.dart';
 
 class SideMenu extends StatefulWidget {
-  const SideMenu({super.key});
+
+  final GlobalKey<ScaffoldState> scaffoldKey;
+
+  const SideMenu({
+    super.key,
+    required this.scaffoldKey
+  });
 
   @override
   State<SideMenu> createState() => _SideMenuState();
 }
 
 class _SideMenuState extends State<SideMenu> {
-  int navDrawerIndex = 1;
+  int navDrawerIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-    final hasNotch = MediaQuery.of(context).viewPadding.top >
-        35; // para verificar si se tiene un notch en la cabecera de la pantalla sobre todo en Ios
+    final hasNotch = MediaQuery.of(context).viewPadding.top > 35; // para verificar si se tiene un notch en la cabecera de la pantalla sobre todo en Ios
 
     return NavigationDrawer(
         selectedIndex: navDrawerIndex,
@@ -24,6 +28,13 @@ class _SideMenuState extends State<SideMenu> {
           setState(() {
             navDrawerIndex = value;
           });
+
+          final menuItem = appMenuItems[value];
+
+          context.push(menuItem.link);  
+
+          widget.scaffoldKey.currentState?.closeDrawer();
+
         },
         children: [
           UserAccountsDrawerHeader(
@@ -37,6 +48,7 @@ class _SideMenuState extends State<SideMenu> {
             padding: EdgeInsets.fromLTRB(28, hasNotch ? 10 : 20, 16, 10),
             child: const Text('Main'),
           ),
+
           ...appMenuItems.sublist(0, 3).map((item) =>
               NavigationDrawerDestination(
                   icon: Icon(item.icon), label: Text(item.title))),
